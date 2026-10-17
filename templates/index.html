@@ -16,7 +16,10 @@
   <h2 id="titulo-login">Entrar</h2>
   <div id="campos-cadastro" class="oculto">
     <input id="nome" placeholder="Nome completo" style="width:100%">
-    <input id="telefone" placeholder="Telefone com DDD" style="width:100%">
+    <div class="campo-telefone">
+      <input id="ddd" placeholder="DDD" maxlength="2" inputmode="numeric" class="so-numeros">
+      <input id="telefone" placeholder="Telefone" maxlength="9" inputmode="numeric" class="so-numeros">
+    </div>
   </div>
   <input id="email" type="email" placeholder="E-mail" style="width:100%">
   <input id="senha" type="password" placeholder="Senha" style="width:100%">
@@ -32,7 +35,7 @@
     <h3>Usuários</h3>
     <div class="linha">
       <input id="u-nome" placeholder="Nome completo"><input id="u-email" placeholder="E-mail">
-      <input id="u-tel" placeholder="Telefone"><input id="u-senha" type="password" placeholder="Senha">
+      <input id="u-ddd" placeholder="DDD" maxlength="2" inputmode="numeric" class="so-numeros" style="width:60px"><input id="u-tel" placeholder="Telefone" maxlength="9" inputmode="numeric" class="so-numeros" style="width:120px"><input id="u-senha" type="password" placeholder="Senha">
       <select id="u-perfil"><option value="aluno">aluno</option><option value="professor">professor</option><option value="admin">admin</option></select>
       <button id="btn-add-usuario" onclick="addUsuario()">Cadastrar</button>
     </div>

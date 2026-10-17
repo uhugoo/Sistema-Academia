@@ -108,3 +108,20 @@ th,td {
 canvas {
   max-height:260px;
 }
+
+.campo-telefone {
+  display: flex;
+  gap: 6px;
+}
+
+.campo-telefone input {
+  margin: 3px 0;
+}
+
+.campo-telefone input:first-child {
+  width: 30%;
+}
+
+.campo-telefone input:last-child {
+  width: 70%;
+}

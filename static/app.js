@@ -34,7 +34,7 @@ async function entrar() {
   $('msg-login').textContent = '';
   try {
     if (modoCadastro) {
-      await api('POST', '/api/auth/registro', {nome_completo: $('nome').value, telefone: $('telefone').value, email: $('email').value, senha: $('senha').value});
+      await api('POST', '/api/auth/registro', {nome_completo: $('nome').value, telefone: telefoneCompleto($('ddd').value, $('telefone').value), email: $('email').value, senha: $('senha').value});
       aviso('Conta criada! Faça login.'); alternarCadastro(); return;
     }
     const d = await api('POST', '/api/auth/login', {email: $('email').value, senha: $('senha').value});
@@ -68,6 +68,15 @@ async function preencherAlunos(...ids) {
   ids.forEach(id => $(id).innerHTML = alunos.map(a => `<option value="${a.id}">${esc(a.nome_completo)}</option>`).join(''));
 }
 
+// ---- Telefone: junta DDD + número (só dígitos) e valida antes de enviar
+function telefoneCompleto(ddd, numero) {
+  ddd = ddd.replace(/\D/g, ''); numero = numero.replace(/\D/g, '');
+  if (ddd.length !== 2) throw new Error('Informe o DDD com 2 dígitos');
+  if (numero.length < 8 || numero.length > 9) throw new Error('Telefone deve ter 8 ou 9 dígitos');
+  return ddd + numero;
+}
+document.addEventListener('input', e => { if (e.target.classList.contains('so-numeros')) e.target.value = e.target.value.replace(/\D/g, ''); });
+
 // ---- Usuários
 async function carregarUsuarios() {
   const us = await api('GET', '/api/usuarios?q=' + encodeURIComponent($('u-busca').value));
@@ -75,8 +84,8 @@ async function carregarUsuarios() {
     <td>${me.perfil === 'admin' && u.id !== me.id ? `<button class="del" onclick="removerUsuario(${u.id})">Remover</button>` : ''}</td></tr>`).join('');
 }
 const addUsuario = tentar(async () => {
-  await api('POST', '/api/usuarios', {nome_completo: $('u-nome').value, email: $('u-email').value, telefone: $('u-tel').value, senha: $('u-senha').value, perfil: me.perfil === 'admin' ? $('u-perfil').value : 'aluno'});
-  ['u-nome','u-email','u-tel','u-senha'].forEach(i => $(i).value = ''); aviso('Usuário cadastrado'); carregarUsuarios();
+  await api('POST', '/api/usuarios', {nome_completo: $('u-nome').value, email: $('u-email').value, telefone: telefoneCompleto($('u-ddd').value, $('u-tel').value), senha: $('u-senha').value, perfil: me.perfil === 'admin' ? $('u-perfil').value : 'aluno'});
+  ['u-nome','u-email','u-ddd','u-tel','u-senha'].forEach(i => $(i).value = ''); aviso('Usuário cadastrado'); carregarUsuarios();
 });
 const removerUsuario = tentar(async id => { if (!confirm('Remover usuário?')) return; await api('DELETE', '/api/usuarios/' + id); aviso('Usuário removido'); carregarUsuarios(); });
 
