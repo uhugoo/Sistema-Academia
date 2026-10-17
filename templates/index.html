@@ -1,0 +1,106 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Academia - Gestão de Treinos</title>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+<link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+<header><strong>🏋️ Academia</strong><span id="usuario-logado"></span><button id="btn-sair" class="sec oculto" onclick="sair()">Sair</button></header>
+<div id="msg" class="oculto"></div>
+<main>
+
+<section id="tela-login" class="card" style="max-width:380px;margin:40px auto">
+  <h2 id="titulo-login">Entrar</h2>
+  <div id="campos-cadastro" class="oculto">
+    <input id="nome" placeholder="Nome completo" style="width:100%">
+    <input id="telefone" placeholder="Telefone com DDD" style="width:100%">
+  </div>
+  <input id="email" type="email" placeholder="E-mail" style="width:100%">
+  <input id="senha" type="password" placeholder="Senha" style="width:100%">
+  <button id="btn-login" onclick="entrar()" style="width:100%">Entrar</button>
+  <p id="msg-login" style="color:#dc2626;min-height:18px"></p>
+  <a href="#" id="alternar" onclick="alternarCadastro();return false">Criar conta de aluno</a>
+</section>
+
+<section id="painel" class="oculto">
+  <nav id="menu" class="card"></nav>
+
+  <div class="aba card oculto" id="aba-usuarios">
+    <h3>Usuários</h3>
+    <div class="linha">
+      <input id="u-nome" placeholder="Nome completo"><input id="u-email" placeholder="E-mail">
+      <input id="u-tel" placeholder="Telefone"><input id="u-senha" type="password" placeholder="Senha">
+      <select id="u-perfil"><option value="aluno">aluno</option><option value="professor">professor</option><option value="admin">admin</option></select>
+      <button id="btn-add-usuario" onclick="addUsuario()">Cadastrar</button>
+    </div>
+    <input id="u-busca" placeholder="Pesquisar..." oninput="carregarUsuarios()">
+    <table><thead><tr><th>ID</th><th>Nome</th><th>E-mail</th><th>Telefone</th><th>Perfil</th><th></th></tr></thead><tbody id="tb-usuarios"></tbody></table>
+  </div>
+
+  <div class="aba card oculto" id="aba-exercicios">
+    <h3>Exercícios</h3>
+    <div class="linha" id="form-exercicio">
+      <input id="e-nome" placeholder="Nome do exercício">
+      <select id="e-tipo"><option>musculacao</option><option>cardio</option><option>alongamento</option></select>
+      <select id="e-grupo"></select>
+      <button id="btn-add-exercicio" onclick="addExercicio()">Cadastrar</button>
+      <input id="g-nome" placeholder="Novo grupo muscular"><button class="sec" onclick="addGrupo()">+ Grupo</button>
+    </div>
+    <div class="linha">
+      <input id="e-busca" placeholder="Pesquisar..." oninput="carregarExercicios()">
+      <select id="e-filtro" onchange="carregarExercicios()"><option value="">Todos os tipos</option><option>musculacao</option><option>cardio</option><option>alongamento</option></select>
+    </div>
+    <table><thead><tr><th>Nome</th><th>Tipo</th><th>Grupo</th><th></th></tr></thead><tbody id="tb-exercicios"></tbody></table>
+  </div>
+
+  <div class="aba card oculto" id="aba-fichas">
+    <h3>Fichas de treino</h3>
+    <div id="form-ficha" class="oculto">
+      <select id="f-aluno"></select><input id="f-nome" placeholder="Nome da ficha (ex: Treino A)">
+      <div id="f-itens"></div>
+      <button class="sec" onclick="addLinhaFicha()">+ Exercício</button>
+      <button id="btn-criar-ficha" onclick="criarFicha()">Criar ficha</button>
+    </div>
+    <div id="lista-fichas"></div>
+  </div>
+
+  <div class="aba card oculto" id="aba-treinos">
+    <h3>Registrar treino</h3>
+    <select id="t-ficha" onchange="montarTreino()"></select>
+    <div id="t-itens"></div>
+    <input id="t-duracao" type="number" min="1" placeholder="Duração (min)">
+    <button id="btn-registrar-treino" onclick="registrarTreino()">Registrar</button>
+    <h3>Histórico</h3>
+    <table><thead><tr><th>Data</th><th>Ficha</th><th>Duração</th><th>Volume (kg)</th></tr></thead><tbody id="tb-treinos"></tbody></table>
+  </div>
+
+  <div class="aba card oculto" id="aba-avaliacoes">
+    <h3>Avaliações físicas</h3>
+    <div id="form-avaliacao" class="oculto linha">
+      <select id="a-aluno"></select><input id="a-peso" type="number" step="0.1" placeholder="Peso (kg)">
+      <input id="a-altura" type="number" step="0.01" placeholder="Altura (m)"><input id="a-gordura" type="number" step="0.1" placeholder="% gordura">
+      <button id="btn-add-avaliacao" onclick="addAvaliacao()">Registrar</button>
+    </div>
+    <table><thead><tr><th>Data</th><th>Aluno</th><th>Peso</th><th>Altura</th><th>% Gordura</th><th>IMC</th></tr></thead><tbody id="tb-avaliacoes"></tbody></table>
+  </div>
+
+  <div class="aba card oculto" id="aba-dashboard">
+    <h3>Dashboard de evolução</h3>
+    <select id="d-aluno" class="oculto" onchange="carregarDashboard()"></select>
+    <p id="d-resumo"></p>
+    <canvas id="grafico-peso"></canvas><canvas id="grafico-volume"></canvas>
+  </div>
+
+  <div class="aba card oculto" id="aba-planos">
+    <h3>Planos e matrículas</h3>
+    <div class="linha"><select id="p-aluno"></select><select id="p-plano"></select><button id="btn-matricular" onclick="matricular()">Matricular</button></div>
+    <table><thead><tr><th>Aluno</th><th>Plano</th><th>Início</th><th>Fim</th><th>Valor</th></tr></thead><tbody id="tb-matriculas"></tbody></table>
+  </div>
+</main>
+
+<script src="{{ url_for('static', filename='app.js') }}"></script>
+</body>
+</html>
